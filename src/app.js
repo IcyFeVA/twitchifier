@@ -1,40 +1,66 @@
 import "./stylesheets/main.css";
+import Client from "dank-twitch-api/dist/client";
 
-// Everything below is just a demo. You can delete all of it.
 
-import { ipcRenderer } from "electron";
-import jetpack from "fs-jetpack";
-import { greet } from "./hello_world/hello_world";
-import env from "env";
+var open = require("open");
 
-document.querySelector("#app").style.display = "block";
-document.querySelector("#greet").innerHTML = greet();
-document.querySelector("#env").innerHTML = env.name;
-document.querySelector("#electron-version").innerHTML =
-  process.versions.electron;
 
-const osMap = {
-  win32: "Windows",
-  darwin: "macOS",
-  linux: "Linux"
+
+
+
+let firstrun = true
+
+const streamers = ['imakuni', 'towelliee', 'prattbros', 'princesspaperplane', 'kitboga', 'sovietwomble', 'frogpants', 'bottedfps', 'woodenpotatoes', 'vivisartservice', 'jon_jagger', 'beauschwartz', 'agent_engel', 'guildwars2']
+
+let statuses = {}
+let userData = {}
+
+const getAllStreamersStatuses = (client) => {
+  if(firstrun) {
+    setTimeout(() => {
+      firstrun = false
+    }, 7000)
+  }
+  streamers.forEach( async (streamer, index) => {
+    try {
+      let user = await client.getUser(streamer);
+      user.isLive().then(function(result) {
+        if(firstrun) {
+          statuses[streamer] = result
+          userData[streamer] = user
+        } else {
+          if(statuses[streamer] !== result) {
+            statuses[streamer] = result
+            if(result) {
+              new Notification(userData[streamer].displayName + ' is now online!', { body: 'Click to go to stream.' })
+  .onclick = () => open("https://www.twitch.tv/" + streamer)
+            } else {
+              new Notification('TTV-Notifier', { body: userData[streamer].displayName + ' is now offline...' })
+            }
+          }
+        }
+      }) 
+    } catch (error) {
+      console.log('Error', error, error?.response?.body);
+    }
+  });
+}
+
+const autoUpdate = (client, delay) => {
+  console.dir(statuses)
+  getAllStreamersStatuses(client)
+  setTimeout(() => {
+    autoUpdate(client, delay)
+  }, delay)
+}
+
+const ttv = async () => {
+  const client = new Client({
+    clientId: 'w9iel69nch6roc7753qsld3ygmheor',
+    clientSecret: '8akn7ofyez673ccn9llee1y09g3jer',
+  });
+  
+  autoUpdate(client, 15000)
 };
-document.querySelector("#os").innerHTML = osMap[process.platform];
 
-// We can communicate with main process through messages.
-ipcRenderer.on("app-path", (event, appDirPath) => {
-  // Holy crap! This is browser window with HTML and stuff, but I can read
-  // files from disk like it's node.js! Welcome to Electron world :)
-  const appDir = jetpack.cwd(appDirPath);
-  const manifest = appDir.read("package.json", "json");
-  document.querySelector("#author").innerHTML = manifest.author;
-});
-ipcRenderer.send("need-app-path");
-
-document.querySelector(".electron-website-link").addEventListener(
-  "click",
-  event => {
-    ipcRenderer.send("open-external-link", event.target.href);
-    event.preventDefault();
-  },
-  false
-);
+ttv()
