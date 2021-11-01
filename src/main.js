@@ -1,6 +1,6 @@
 import path from "path";
 import url from "url";
-import { app, Menu, Tray, nativeImage, Notification } from "electron";
+import { app, Menu, Tray, nativeImage, Notification, ipcMain } from "electron";
 import appMenuTemplate from "./menu/app_menu_template";
 import aboutMenuTemplate from "./menu/about_menu_template";
 import createWindow from "./helpers/window";
@@ -15,6 +15,28 @@ let paused = false;
 let isQuiting = false;
 
 const store = new Store();
+
+let streamers = [
+  "imakuni",
+  "towelliee",
+  "prattbros",
+  "princesspaperplane",
+  "kitboga",
+  "sovietwomble",
+  "frogpants",
+  "bottedfps",
+  "woodenpotatoes",
+  "vivisartservice",
+  "jon_jagger",
+  "beauschwartz",
+  "agent_engel",
+  "guildwars2",
+  "mauriceweber",
+  "rtgame",
+  "rocketleague",
+  "bottedfps",
+  "monstersandexplosions"
+];
 
 // const icon = path.join(__dirname, 'tray.png')
 const icon = nativeImage.createFromDataURL(
@@ -45,9 +67,12 @@ const setApplicationMenu = () => {
  */
 
 const initIpc = () => {
-  // ipcMain.on("get-pause", (e, arg) => {
-  //   e.reply("pause-status", paused);
-  // });
+  ipcMain.on("get-pause", (e, arg) => {
+    e.reply("pause-status", paused);
+  });
+  ipcMain.on("get-streamers", (e, arg) => {
+    e.reply("streamers", streamers);
+  });
 };
 
 /******************************************
@@ -134,28 +159,6 @@ const initTwitchMate = () => {
   let firstrun = true;
   let statuses = {};
   let userData = {};
-
-  const streamers = [
-    "imakuni",
-    "towelliee",
-    "prattbros",
-    "princesspaperplane",
-    "kitboga",
-    "sovietwomble",
-    "frogpants",
-    "bottedfps",
-    "woodenpotatoes",
-    "vivisartservice",
-    "jon_jagger",
-    "beauschwartz",
-    "agent_engel",
-    "guildwars2",
-    "mauriceweber",
-    "rtgame",
-    "rocketleague",
-    "bottedfps",
-    "monstersandexplosions"
-  ];
 
   const createNotification = (data) => {
     notification = new Notification({ title: data.title, body: data.body, silent: false });
