@@ -43,6 +43,7 @@
     "electron": "^13.0.1",
     "electron-builder": "^22.5.1",
     "electron-mocha": "^10.0.0",
+    "electron-store": "^8.0.1",
     "mocha": "^8.3.2",
     "open": "^8.4.0",
     "source-map-support": "^0.5.6",
