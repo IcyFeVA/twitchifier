@@ -57,6 +57,36 @@ a {
   color: #cb3837;
 }
 
-.container {
+
+
+.inputName {
+  background-color:black;
+  color: white;
+  padding: 8px;
+}
+
+.addButton {
+  background-color: #cb3837;
+  color: white;
+  padding: 8px 16px;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  background-color:darkslategrey;
+  color: white;
+  padding:8px;
+  margin-bottom: 1px;
+}
+
+.btnDelete {
+  width: 32px;
+  height: 24px;
+  background-color:black;
   text-align: center;
+}
+
+.name {
+  width: 100%;
 }
