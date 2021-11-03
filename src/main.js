@@ -8,35 +8,30 @@ import Store from "electron-store";
 import Client from "dank-twitch-api/dist/client";
 import open from "open";
 
+let streamers = []
 let mainWindow;
 let notification;
 let tray;
 let paused = false;
 let isQuiting = false;
+let firstrun = true;
+let statuses = {};
+let userData = {};
+
 
 const store = new Store();
+streamers = store.get("streamers" || []); 
 
-let streamers = [
-  "imakuni",
-  "towelliee",
-  "prattbros",
-  "princesspaperplane",
-  "kitboga",
-  "sovietwomble",
-  "frogpants",
-  "bottedfps",
-  "woodenpotatoes",
-  "vivisartservice",
-  "jon_jagger",
-  "beauschwartz",
-  "agent_engel",
-  "guildwars2",
-  "mauriceweber",
-  "rtgame",
-  "rocketleague",
-  "bottedfps",
-  "monstersandexplosions"
-];
+// testing
+// let streamers = [
+//   "imakuni",
+//   "towelliee",
+//   "prattbros",
+//   "princesspaperplane",
+//   "kitboga",
+//   "sovietwomble",
+// ];
+// store.set("streamers", streamers); 
 
 // const icon = path.join(__dirname, 'tray.png')
 const icon = nativeImage.createFromDataURL(
@@ -71,6 +66,12 @@ const initIpc = () => {
     e.reply("pause-status", paused);
   });
   ipcMain.on("get-streamers", (e, arg) => {
+    e.reply("streamers", streamers);
+  });
+  ipcMain.on("add-streamer", (e, streamer) => {
+    console.log('pushing', streamer)
+    streamers.push(streamer)
+    store.set("streamers", streamers); 
     e.reply("streamers", streamers);
   });
 };
@@ -153,74 +154,75 @@ const createTray = () => {
 /******************************************
  * Twitch Mate
  */
+ const createNotification = (data) => {
+  notification = new Notification({ title: data.title, body: data.body, silent: false });
 
-
-const initTwitchMate = () => {
-  let firstrun = true;
-  let statuses = {};
-  let userData = {};
-
-  const createNotification = (data) => {
-    notification = new Notification({ title: data.title, body: data.body, silent: false });
-
-    if(data.streamer) {
-      notification.on('click', (event, arg) => {
-        open("https://www.twitch.tv/" + data.streamer)
-      });
-    }
-
-    notification.show();
+  if(data.streamer) {
+    notification.on('click', (event, arg) => {
+      open("https://www.twitch.tv/" + data.streamer)
+    });
   }
 
-  const getAllStreamersStatuses = (client) => {
-    if (firstrun) {
-      setTimeout(() => {
-        firstrun = false;
-      }, 7000);
-    }
+  notification.show();
+}
 
-    streamers.forEach(async (streamer, index) => {
-      try {
-        let user = await client.getUser(streamer);
-        user.isLive().then(function (result) {
-          if (firstrun) {
+const getAllStreamersStatuses = (client) => {
+  if (firstrun) {
+    setTimeout(() => {
+      firstrun = false;
+    }, 3000);
+  }
+
+  streamers.forEach(async (streamer, index) => {
+    try {
+      let user = await client.getUser(streamer);
+      user.isLive().then(function (result) {
+        if (firstrun) {
+          statuses[streamer] = result;
+          userData[streamer] = user;
+        } else {
+          if(!statuses[streamer]) {
             statuses[streamer] = result;
             userData[streamer] = user;
-          } else {
-            if (statuses[streamer] !== result) {
-              statuses[streamer] = result;
-              if(!paused) {   // only show notifications if not paused
-                if (result) {
-                  createNotification({ streamer: streamer, title: userData[streamer].displayName + " is now online!", body: "Click to go to stream." })
-                } else {
-                  createNotification({ title: "TTV-Notifier", body: userData[streamer].displayName + " is now offline..." })
-                }
+          }
+          if (statuses[streamer] !== result) {
+            statuses[streamer] = result;
+            if(!paused) {   // only show notifications if not paused
+              if (result) {
+                createNotification({ streamer: streamer, title: userData[streamer].displayName + " is now online!", body: "Click to go to stream." })
+              } else {
+                createNotification({ title: "TTV-Notifier", body: userData[streamer].displayName + " is now offline..." })
               }
             }
           }
-        });
-      } catch (error) {
-        console.log("Error", error, error?.response?.body);
-      }
-    });
-  };
+        }
+      });
+    } catch (error) {
+      console.log("Error", error, error?.response?.body);
+    }
+  });
+};
 
-  const autoUpdate = (client, delay) => {
-    console.dir(statuses);
-    getAllStreamersStatuses(client);
-    setTimeout(() => {
-      autoUpdate(client, delay);
-    }, delay);
-  };
+const autoUpdate = (client, delay) => {
+  console.dir(statuses);
+  getAllStreamersStatuses(client);
+  setTimeout(() => {
+    autoUpdate(client, delay);
+  }, delay);
+};
 
-  const ttv = async () => {
-    const client = new Client({
-      clientId: "w9iel69nch6roc7753qsld3ygmheor",
-      clientSecret: "8akn7ofyez673ccn9llee1y09g3jer",
-    });
+const ttv = async () => {
+  const client = new Client({
+    clientId: "w9iel69nch6roc7753qsld3ygmheor",
+    clientSecret: "8akn7ofyez673ccn9llee1y09g3jer",
+  });
 
-    autoUpdate(client, 15000);
-  };
+  autoUpdate(client, 5000);
+};
+
+const initTwitchMate = () => {
+
+
 
   ttv();
 };

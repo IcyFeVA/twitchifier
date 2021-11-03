@@ -29,8 +29,11 @@ class App extends React.Component {
 
   addStreamer() {
     let input = document.querySelector(".inputName")
-    console.log(input.value)
-    input.value = ""
+
+    if(input.value != "") {
+      ipcRenderer.send("add-streamer", input.value);
+      input.value = ""
+    }
   }
 
   deleteStreamer(streamer) {
