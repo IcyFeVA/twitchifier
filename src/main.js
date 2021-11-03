@@ -69,8 +69,20 @@ const initIpc = () => {
     e.reply("streamers", streamers);
   });
   ipcMain.on("add-streamer", (e, streamer) => {
-    console.log('pushing', streamer)
+    const index = streamers.indexOf(streamer)
+    if(index > -1) {
+      console.log('streamer already in list')
+      return;
+    }
     streamers.push(streamer)
+    store.set("streamers", streamers); 
+    e.reply("streamers", streamers);
+  });
+  ipcMain.on("delete-streamer", (e, streamer) => {
+    const index = streamers.indexOf(streamer);
+    streamers.splice(index, 1);
+    delete statuses[streamer]
+    delete userData[streamer]
     store.set("streamers", streamers); 
     e.reply("streamers", streamers);
   });

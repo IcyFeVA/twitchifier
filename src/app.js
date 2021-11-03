@@ -37,7 +37,7 @@ class App extends React.Component {
   }
 
   deleteStreamer(streamer) {
-    console.log(streamer)
+    ipcRenderer.send("delete-streamer", streamer);
   }
 
   render() {
