@@ -45,9 +45,6 @@ body {
 }
 
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-family: sans-serif;
   color: #d3d3d3;
 }
@@ -58,35 +55,82 @@ a {
 }
 
 
+.UI {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+}
 
 .inputName {
-  background-color:black;
+  background-color:rgb(26, 26, 26);
   color: white;
   padding: 8px;
+  margin-bottom: 4px;
+  width: 100%;
 }
 
 .addButton {
-  background-color: #cb3837;
+  background-color: #4737cb;
   color: white;
   padding: 8px 16px;
+  cursor: pointer;
 }
 
 .listItem {
   display: flex;
   align-items: center;
-  background-color:darkslategrey;
+  background-color:rgb(15, 15, 15);
   color: white;
   padding:8px;
   margin-bottom: 1px;
+  height: 40px;
 }
 
 .btnDelete {
-  width: 32px;
-  height: 24px;
-  background-color:black;
+  width: 40px;
   text-align: center;
 }
 
 .name {
   width: 100%;
+  cursor: pointer;
+}
+
+.dot-unknown {
+  height: 5px;
+  width: 5px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.dot-offline {
+  height: 5px;
+  width: 5px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.dot-online {
+  height: 5px;
+  width: 5px;
+  background-color: green;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.fa-minus-square {
+  color: rgb(65, 65, 65);
+}
+.fa-minus-square:hover {
+  color: red;
+  cursor: pointer;
 }

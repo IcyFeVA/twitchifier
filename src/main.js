@@ -8,7 +8,6 @@ import Store from "electron-store";
 import Client from "dank-twitch-api/dist/client";
 import open from "open";
 
-let streamers = []
 let mainWindow;
 let notification;
 let tray;
@@ -17,12 +16,10 @@ let isQuiting = false;
 let firstrun = true;
 let statuses = {};
 let userData = {};
-
+let client;
 
 const store = new Store();
-streamers = store.get("streamers" || []); 
-
-// testing
+let streamers = store.get("streamers" || []); 
 // let streamers = [
 //   "imakuni",
 //   "towelliee",
@@ -32,6 +29,7 @@ streamers = store.get("streamers" || []);
 //   "sovietwomble",
 // ];
 // store.set("streamers", streamers); 
+
 
 // const icon = path.join(__dirname, 'tray.png')
 const icon = nativeImage.createFromDataURL(
@@ -61,30 +59,49 @@ const setApplicationMenu = () => {
  * Communication
  */
 
+const doesExist = async (streamer) => {
+  let user = await client.getUser(streamer)
+  if( !user.hasOwnProperty('isLive')) {
+    return false
+  }
+  return true
+}
+
 const initIpc = () => {
   ipcMain.on("get-pause", (e, arg) => {
     e.reply("pause-status", paused);
   });
+
   ipcMain.on("get-streamers", (e, arg) => {
-    e.reply("streamers", streamers);
+    e.reply("streamers", streamers, statuses);
   });
+
   ipcMain.on("add-streamer", (e, streamer) => {
     const index = streamers.indexOf(streamer)
     if(index > -1) {
       console.log('streamer already in list')
       return;
     }
+    if(!doesExist()) {
+      console.log('streamer does not exist')
+      return;
+    }
     streamers.push(streamer)
     store.set("streamers", streamers); 
-    e.reply("streamers", streamers);
+    e.reply("streamers", streamers, statuses);
   });
+
   ipcMain.on("delete-streamer", (e, streamer) => {
     const index = streamers.indexOf(streamer);
     streamers.splice(index, 1);
     delete statuses[streamer]
     delete userData[streamer]
     store.set("streamers", streamers); 
-    e.reply("streamers", streamers);
+    e.reply("streamers", streamers, statuses);
+  });
+
+  ipcMain.on("goto-streamer", (e, streamer) => {
+    open("https://www.twitch.tv/" + streamer)
   });
 };
 
@@ -146,7 +163,7 @@ const createTray = () => {
       click: (e) => {
         paused = e.checked;
         store.set("paused", paused);
-        console.log("stored", store.get("paused"));
+        console.log("paused", store.get("paused"));
       },
     },
     {
@@ -217,6 +234,7 @@ const getAllStreamersStatuses = (client) => {
 
 const autoUpdate = (client, delay) => {
   console.dir(statuses);
+  mainWindow.webContents.send('streamers',streamers, statuses);
   getAllStreamersStatuses(client);
   setTimeout(() => {
     autoUpdate(client, delay);
@@ -224,7 +242,7 @@ const autoUpdate = (client, delay) => {
 };
 
 const ttv = async () => {
-  const client = new Client({
+  client = new Client({
     clientId: "w9iel69nch6roc7753qsld3ygmheor",
     clientSecret: "8akn7ofyez673ccn9llee1y09g3jer",
   });
