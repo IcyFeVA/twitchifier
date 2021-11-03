@@ -111,8 +111,8 @@ const initIpc = () => {
 
 const createMainWindow = () => {
   mainWindow = createWindow("main", {
-    width: 1500,
-    height: 900,
+    width: 370,
+    height: 600,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
