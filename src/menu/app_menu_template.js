@@ -7,7 +7,7 @@ export default {
       label: "Quit",
       accelerator: "CmdOrCtrl+Q",
       click: () => {
-        app.quit();
+        app.exit(0)
       }
     }
   ]

@@ -1,8 +1,11 @@
+import open from "open";
+
 export default {
   label: "About",
   submenu: [
-    { label: "Made by IcyFeVA" },
-    { type: "separator" },
-    { label: "www.icyfeva.com"},
+    { label: "Twitchifier by IcyFeVA",
+  click: () => {
+    open("https://www.twitchifier.com/")
+  }},
   ]
 };

@@ -4,7 +4,7 @@ import "./stylesheets/main.css";
 import { ipcRenderer } from "electron";
 
 ipcRenderer.on("pause-status", (e, paused) => {
-  console.log("---", paused);
+  //console.log("---", paused);
 });
 
 
@@ -22,7 +22,7 @@ class App extends React.Component {
 
   componentWillMount() {
     ipcRenderer.on("pause-status", (e, paused) => {
-      console.log("---", paused);
+      //console.log("---", paused);
     });
     ipcRenderer.on("streamers", (e, streamers, statuses) => {
       this.setState({ streamers: streamers, statuses: statuses, renderCounter: this.state.renderCounter+1 });
@@ -67,7 +67,7 @@ class App extends React.Component {
             <li className="listItem">
               <div className="dot-online"></div>
               <div className="name" onClick={() => { ipcRenderer.send("goto-streamer", props.streamer) }}>{props.streamer}</div>
-              <div className="btnDelete fa fa-minus-square" onClick={() => props.func(props.streamer)}></div>
+              <div className="btnDelete fa fa-times" onClick={() => props.func(props.streamer)}></div>
             </li>
           );
         } else {
@@ -75,7 +75,7 @@ class App extends React.Component {
             <li className="listItem">
               <div className="dot-offline" ></div>
               <div className="name" onClick={() => { ipcRenderer.send("goto-streamer", props.streamer) }}>{props.streamer}</div>
-              <div className="btnDelete fa fa-minus-square" onClick={() => props.func(props.streamer)}></div>
+              <div className="btnDelete fa fa-times" onClick={() => props.func(props.streamer)}></div>
             </li>
           );
         }
@@ -84,7 +84,7 @@ class App extends React.Component {
         <li className="listItem">
           <div className="dot-unknown"></div>
           <div className="name">{props.streamer}</div>
-          <div className="btnDelete fa fa-minus-square" onClick={() => props.func(props.streamer)}></div>
+          <div className="btnDelete fa fa-times" onClick={() => props.func(props.streamer)}></div>
         </li>
       );
     }

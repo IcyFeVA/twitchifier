@@ -93,7 +93,7 @@ a {
   height: 40px;
 }
 .listItem:hover {
-  background-color: #141414;
+  background-color: #1e2024;
 }
 
 .btnDelete {
@@ -131,11 +131,11 @@ a {
   margin-right: 16px;
 }
 
-.fa-minus-square {
+.fa-times {
   color: rgb(65, 65, 65);
   transition: all 0.3s;
 }
-.fa-minus-square:hover {
+.fa-times:hover {
   color: red;
   cursor: pointer;
 }

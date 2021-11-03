@@ -49,10 +49,10 @@ if (env.name !== "production") {
 
 const setApplicationMenu = () => {
   const menus = [appMenuTemplate, aboutMenuTemplate];
-  // if (env.name !== "production") {
-  //   menus.push(devMenuTemplate);
-  // }
-  //Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
+  if (env.name !== "production") {
+    //menus.push(devMenuTemplate);
+  }
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
 };
 
 /******************************************
@@ -79,11 +79,11 @@ const initIpc = () => {
   ipcMain.on("add-streamer", (e, streamer) => {
     const index = streamers.indexOf(streamer)
     if(index > -1) {
-      console.log('streamer already in list')
+      //console.log('streamer already in list')
       return;
     }
     if(!doesExist()) {
-      console.log('streamer does not exist')
+      //console.log('streamer does not exist')
       return;
     }
     streamers.push(streamer)
@@ -123,7 +123,7 @@ const createMainWindow = () => {
   mainWindow.loadFile(path.join(__dirname, "app.html"));
 
   mainWindow.on("minimize", (e) => {
-    console.log("mini");
+    //console.log("mini");
     e.preventDefault();
     mainWindow.hide();
   });
@@ -163,7 +163,7 @@ const createTray = () => {
       click: (e) => {
         paused = e.checked;
         store.set("paused", paused);
-        console.log("paused", store.get("paused"));
+        //console.log("paused", store.get("paused"));
       },
     },
     {
@@ -220,20 +220,20 @@ const getAllStreamersStatuses = (client) => {
               if (result) {
                 createNotification({ streamer: streamer, title: userData[streamer].displayName + " is now online!", body: "Click to go to stream." })
               } else {
-                createNotification({ title: "TTV-Notifier", body: userData[streamer].displayName + " is now offline..." })
+                createNotification({ title: "Twitchifier", body: userData[streamer].displayName + " is now offline..." })
               }
             }
           }
         }
       });
     } catch (error) {
-      console.log("Error", error, error?.response?.body);
+      //console.log("Error", error, error?.response?.body);
     }
   });
 };
 
 const autoUpdate = (client, delay) => {
-  console.dir(statuses);
+  //console.dir(statuses);
   mainWindow.webContents.send('streamers',streamers, statuses);
   getAllStreamersStatuses(client);
   setTimeout(() => {
