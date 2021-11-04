@@ -161,7 +161,9 @@ const setIcon = () => {
 const createTray = () => {
   tray = new Tray(icon);
 
-  paused = store.get("paused")
+  paused = store.get("paused") || false
+
+  setIcon()
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -213,12 +215,6 @@ const createTray = () => {
 }
 
 const getAllStreamersStatuses = () => {
-  if (firstrun) {
-    setTimeout(() => {
-      firstrun = false;
-    }, 3000);
-  }
-
   streamers.forEach(async (streamer, index) => {
     try {
       let user = await client.getUser(streamer);
@@ -268,6 +264,13 @@ const init = async () => {
   });
 
   initAutoUpdate()
+  update();
+
+  if (firstrun) {
+    setTimeout(() => {
+      firstrun = false;
+    }, 3000);
+  }
 };
 
 

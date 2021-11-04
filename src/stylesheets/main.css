@@ -159,3 +159,19 @@ a {
 ::-webkit-scrollbar-thumb:hover {
   background: #414042;
 }
+
+
+.loader {
+  border: 3px solid rgb(51, 51, 51); /* Light grey */
+  border-top: 3px solid #4737cb; /* Blue */
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  animation: spin 1s linear infinite;
+  margin-right: 7px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

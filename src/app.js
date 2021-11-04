@@ -90,7 +90,7 @@ class App extends React.Component {
       }
       return (
         <li className="listItem">
-          <div className="dot-unknown"></div>
+          <div className="loader"></div>
           <div className="name">{props.streamer}</div>
           <div className="btnDelete fa fa-times" onClick={() => props.func(props.streamer)}></div>
         </li>
