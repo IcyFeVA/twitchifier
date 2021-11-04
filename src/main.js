@@ -20,6 +20,7 @@ let displayNames = {};
 let client;
 
 let updateSpeed = 6000;
+let updateInterval;
 const store = new Store();
 let streamers = store.get("streamers" || []); 
 // let streamers = [
@@ -90,6 +91,7 @@ const initIpc = () => {
     streamers.push(streamer)
     store.set("streamers", streamers); 
     e.reply("streamers", streamers, statuses, displayNames);
+    initAutoUpdate()
   });
 
   ipcMain.on("delete-streamer", (e, streamer) => {
@@ -210,7 +212,7 @@ const createTray = () => {
   notification.show();
 }
 
-const getAllStreamersStatuses = (client) => {
+const getAllStreamersStatuses = () => {
   if (firstrun) {
     setTimeout(() => {
       firstrun = false;
@@ -226,11 +228,7 @@ const getAllStreamersStatuses = (client) => {
           userData[streamer] = user;
           displayNames[streamer] = user.displayName
         } else {
-          // if(!statuses[streamer]) {
-          //   statuses[streamer] = result;
-          //   userData[streamer] = user;
-          //   displayNames[streamer] = user.displayName
-          // }
+          displayNames[streamer] = user.displayName
           if (statuses[streamer] !== result) {
             statuses[streamer] = result;
             if(!paused) {   // only show notifications if not paused
@@ -249,14 +247,19 @@ const getAllStreamersStatuses = (client) => {
   });
 };
 
-let autoUpdate = (client, delay) => {
-  //console.dir(statuses);
+
+
+let update = () => {
   mainWindow.webContents.send('streamers',streamers, statuses, displayNames);
-  getAllStreamersStatuses(client);
-  setTimeout(() => {
-    autoUpdate(client, delay);
-  }, delay);
+  getAllStreamersStatuses();
 };
+
+let initAutoUpdate = () => {
+  clearInterval(updateInterval);
+  updateInterval = setInterval(() => {
+    update();
+  }, updateSpeed)
+}
 
 const init = async () => {
   client = new Client({
@@ -264,8 +267,10 @@ const init = async () => {
     clientSecret: "8akn7ofyez673ccn9llee1y09g3jer",
   });
 
-  autoUpdate(client, updateSpeed);
+  initAutoUpdate()
 };
+
+
 
 
 
@@ -297,4 +302,9 @@ app.whenReady().then(() => {
   app.on("before-quit", function () {
     isQuiting = true;
   });
+
+  
 });
+
+
+
