@@ -226,15 +226,15 @@ const getAllStreamersStatuses = (client) => {
           userData[streamer] = user;
           displayNames[streamer] = user.displayName
         } else {
-          if(!statuses[streamer]) {
-            statuses[streamer] = result;
-            userData[streamer] = user;
-            displayNames[streamer] = user.displayName
-          }
+          // if(!statuses[streamer]) {
+          //   statuses[streamer] = result;
+          //   userData[streamer] = user;
+          //   displayNames[streamer] = user.displayName
+          // }
           if (statuses[streamer] !== result) {
             statuses[streamer] = result;
             if(!paused) {   // only show notifications if not paused
-              if (result) {
+              if (result === true) {
                 createNotification({ streamer: streamer, title: userData[streamer].displayName + " is now online!", body: "Click to go to stream." })
               } else {
                 createNotification({ title: "Twitchifier", body: userData[streamer].displayName + " is now offline..." })
