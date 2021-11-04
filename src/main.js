@@ -22,7 +22,7 @@ let client;
 let updateSpeed = 6000;
 let updateInterval;
 const store = new Store();
-let streamers = store.get("streamers" || []); 
+let streamers = store.get("streamers") || []; 
 // let streamers = [
 //   "imakuni",
 //   "towelliee",
@@ -84,10 +84,10 @@ const initIpc = () => {
 
   ipcMain.on("add-streamer", (e, streamer) => {
     const index = streamers.indexOf(streamer)
-    // if(!doesExist()) {
-    //   //console.log('streamer does not exist')
-    //   return;
-    // }
+    if(index > -1) {
+      console.log('streamer already in list')
+      return;
+    }
     streamers.push(streamer)
     store.set("streamers", streamers); 
     e.reply("streamers", streamers, statuses, displayNames);
