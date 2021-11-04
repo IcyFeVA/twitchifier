@@ -105,6 +105,11 @@ class App extends React.Component {
         <input type="text" placeholder="Streamer" className="inputName" />
         <button className="addButton" onClick={() => this.addStreamer()}>ADD</button>
         </div>
+        {state.streamers.length == 0 &&
+        <div className="suggestion">
+          <span className="bold">Feels empty here...</span><br />Just add your favorite Twitch streamers.
+        </div>
+        }
         <ul>
           {this.state.streamers.map((streamer, i) => (
             <Item key={i} streamer={streamer} state={state} func={this.deleteStreamer}/>

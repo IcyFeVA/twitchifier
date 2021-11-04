@@ -66,11 +66,16 @@ a {
 }
 
 .inputName {
-  background-color:#17191C;
+  background-color:#141415;
   color: white;
   padding: 8px;
   margin-bottom: 4px;
+  margin-top: 4px;
   width: 100%;
+  padding-left: 16px;
+}
+.inputName::placeholder {
+  padding-left: 4px;
 }
 
 .addButton {
@@ -78,9 +83,13 @@ a {
   color: white;
   padding: 8px 16px;
   margin-bottom: 4px;
+  margin-top: 4px;
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
+}
+.addButton:hover {
+  background-color: #5849e7;
 }
 
 .listItem {
@@ -178,4 +187,18 @@ a {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.suggestion {
+  font-size: 0.9rem;
+  color: #6b6b6b;
+  padding: 20px;
+  border: 1px solid #212327;
+  margin: 10px;
+  text-align: center;
+  line-height: 160%;
+}
+
+.bold {
+  font-weight: bold;
 }
