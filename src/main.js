@@ -16,8 +16,10 @@ let isQuiting = false;
 let firstrun = true;
 let statuses = {};
 let userData = {};
+let displayNames = {};
 let client;
 
+let updateSpeed = 6000;
 const store = new Store();
 let streamers = store.get("streamers" || []); 
 // let streamers = [
@@ -73,22 +75,18 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-streamers", (e, arg) => {
-    e.reply("streamers", streamers, statuses);
+    e.reply("streamers", streamers, statuses, displayNames);
   });
 
   ipcMain.on("add-streamer", (e, streamer) => {
     const index = streamers.indexOf(streamer)
-    if(index > -1) {
-      //console.log('streamer already in list')
-      return;
-    }
-    if(!doesExist()) {
-      //console.log('streamer does not exist')
-      return;
-    }
+    // if(!doesExist()) {
+    //   //console.log('streamer does not exist')
+    //   return;
+    // }
     streamers.push(streamer)
     store.set("streamers", streamers); 
-    e.reply("streamers", streamers, statuses);
+    e.reply("streamers", streamers, statuses, displayNames);
   });
 
   ipcMain.on("delete-streamer", (e, streamer) => {
@@ -96,8 +94,9 @@ const initIpc = () => {
     streamers.splice(index, 1);
     delete statuses[streamer]
     delete userData[streamer]
+    delete displayNames[streamer]
     store.set("streamers", streamers); 
-    e.reply("streamers", streamers, statuses);
+    e.reply("streamers", streamers, statuses, displayNames);
   });
 
   ipcMain.on("goto-streamer", (e, streamer) => {
@@ -209,10 +208,12 @@ const getAllStreamersStatuses = (client) => {
         if (firstrun) {
           statuses[streamer] = result;
           userData[streamer] = user;
+          displayNames[streamer] = user.displayName
         } else {
           if(!statuses[streamer]) {
             statuses[streamer] = result;
             userData[streamer] = user;
+            displayNames[streamer] = user.displayName
           }
           if (statuses[streamer] !== result) {
             statuses[streamer] = result;
@@ -232,30 +233,25 @@ const getAllStreamersStatuses = (client) => {
   });
 };
 
-const autoUpdate = (client, delay) => {
+let autoUpdate = (client, delay) => {
   //console.dir(statuses);
-  mainWindow.webContents.send('streamers',streamers, statuses);
+  mainWindow.webContents.send('streamers',streamers, statuses, displayNames);
   getAllStreamersStatuses(client);
   setTimeout(() => {
     autoUpdate(client, delay);
   }, delay);
 };
 
-const ttv = async () => {
+const init = async () => {
   client = new Client({
     clientId: "w9iel69nch6roc7753qsld3ygmheor",
     clientSecret: "8akn7ofyez673ccn9llee1y09g3jer",
   });
 
-  autoUpdate(client, 5000);
+  autoUpdate(client, updateSpeed);
 };
 
-const initTwitchMate = () => {
 
-
-
-  ttv();
-};
 
 /******************************************
  * App
@@ -270,7 +266,7 @@ app.whenReady().then(() => {
 
   createTray();
 
-  initTwitchMate();
+  init();
 
   app.on("activate", function () {
     if (mainWindow.getAllWindows().length === 0) createWindow();

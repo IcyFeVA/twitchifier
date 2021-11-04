@@ -15,7 +15,7 @@ ipcRenderer.on("pause-status", (e, paused) => {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { streamers: [], statuses: {}, renderCounter: 1 };
+    this.state = { streamers: [], statuses: {}, displayNames: {} };
     
     this.deleteStreamer = this.deleteStreamer.bind(this);
   }
@@ -24,9 +24,11 @@ class App extends React.Component {
     ipcRenderer.on("pause-status", (e, paused) => {
       //console.log("---", paused);
     });
-    ipcRenderer.on("streamers", (e, streamers, statuses) => {
-      this.setState({ streamers: streamers, statuses: statuses, renderCounter: this.state.renderCounter+1 });
+
+    ipcRenderer.on("streamers", (e, streamers, statuses, displayNames) => {
+      this.setState({ streamers: streamers, statuses: statuses, displayNames: displayNames});
     });
+
     ipcRenderer.send("get-streamers")
   }
 
@@ -49,7 +51,7 @@ class App extends React.Component {
     let input = document.querySelector(".inputName")
 
     if(input.value != "") {
-      ipcRenderer.send("add-streamer", input.value);
+      ipcRenderer.send("add-streamer", input.value.toLowerCase());
       input.value = ""
     }
   }
@@ -62,11 +64,17 @@ class App extends React.Component {
     function Item(props, func) {
       if(props.state.statuses.hasOwnProperty(props.streamer)) {
         const isLoggedIn = props.state.statuses[props.streamer]
+
+        let displayName = props.streamer
+        if(props.state.displayNames.hasOwnProperty(props.streamer)) {
+          displayName = props.state.displayNames[props.streamer]
+        }
+        
         if(isLoggedIn) {
           return (
             <li className="listItem">
               <div className="dot-online"></div>
-              <div className="name" onClick={() => { ipcRenderer.send("goto-streamer", props.streamer) }}>{props.streamer}</div>
+              <div className="name" onClick={() => { ipcRenderer.send("goto-streamer", props.streamer) }}>{displayName}</div>
               <div className="btnDelete fa fa-times" onClick={() => props.func(props.streamer)}></div>
             </li>
           );
@@ -74,7 +82,7 @@ class App extends React.Component {
           return (
             <li className="listItem">
               <div className="dot-offline" ></div>
-              <div className="name" onClick={() => { ipcRenderer.send("goto-streamer", props.streamer) }}>{props.streamer}</div>
+              <div className="name" onClick={() => { ipcRenderer.send("goto-streamer", props.streamer) }}>{displayName}</div>
               <div className="btnDelete fa fa-times" onClick={() => props.func(props.streamer)}></div>
             </li>
           );
