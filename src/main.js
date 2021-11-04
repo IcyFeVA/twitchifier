@@ -88,7 +88,7 @@ const initIpc = () => {
       console.log('streamer already in list')
       return;
     }
-    streamers.push(streamer)
+    streamers = [streamer, ...streamers]
     store.set("streamers", streamers); 
     e.reply("streamers", streamers, statuses, displayNames);
     initAutoUpdate()

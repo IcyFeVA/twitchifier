@@ -88,6 +88,7 @@ class App extends React.Component {
           );
         }
       }
+
       return (
         <li className="listItem">
           <div className="loader"></div>
