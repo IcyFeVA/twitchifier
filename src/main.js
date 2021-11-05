@@ -15,22 +15,19 @@ let paused = false;
 let isQuiting = false;
 let firstrun = true;
 let statuses = {};
-let userData = {};
-let displayNames = {};
 let client;
 
 let updateSpeed = 6000;
 let updateInterval;
 const store = new Store();
-let streamers = store.get("streamers") || []; 
-// let streamers = [
-//   "imakuni",
-//   "towelliee",
-//   "prattbros",
-//   "princesspaperplane",
-//   "kitboga",
-//   "sovietwomble",
-// ];
+let streamers = store.get("streamers") || {}; 
+console.log(streamers)
+// let streamers = {
+//   imakuni: {},
+//   towelliee: {},
+//   bobross: {},
+//   sovietwomble: {}
+// };
 // store.set("streamers", streamers); 
 
 
@@ -65,13 +62,7 @@ const setApplicationMenu = () => {
  * Communication
  */
 
-const doesExist = async (streamer) => {
-  let user = await client.getUser(streamer)
-  if( !user.hasOwnProperty('isLive')) {
-    return false
-  }
-  return true
-}
+
 
 const initIpc = () => {
   ipcMain.on("get-pause", (e, arg) => {
@@ -79,29 +70,24 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-streamers", (e, arg) => {
-    e.reply("streamers", streamers, statuses, displayNames);
+    e.reply("streamers", streamers);
   });
 
   ipcMain.on("add-streamer", (e, streamer) => {
-    const index = streamers.indexOf(streamer)
-    if(index > -1) {
+    if(streamers.hasOwnProperty(streamer)) {
       console.log('streamer already in list')
       return;
     }
-    streamers = [streamer, ...streamers]
+    streamers[streamer] = {}
     store.set("streamers", streamers); 
-    e.reply("streamers", streamers, statuses, displayNames);
+    e.reply("streamers", streamers);
     initAutoUpdate()
   });
 
   ipcMain.on("delete-streamer", (e, streamer) => {
-    const index = streamers.indexOf(streamer);
-    streamers.splice(index, 1);
-    delete statuses[streamer]
-    delete userData[streamer]
-    delete displayNames[streamer]
+    delete streamers[streamer]
     store.set("streamers", streamers); 
-    e.reply("streamers", streamers, statuses, displayNames);
+    e.reply("streamers", streamers);
   });
 
   ipcMain.on("goto-streamer", (e, streamer) => {
@@ -186,6 +172,10 @@ const createTray = () => {
     {
       label: "Quit",
       click: () => {
+        for (const [key, val] of Object.entries(streamers)) {
+          streamers[key] = {}
+        }
+        store.set("streamers", streamers); 
         app.exit(0);
       },
     },
@@ -215,28 +205,39 @@ const createTray = () => {
 }
 
 const getAllStreamersStatuses = () => {
-  streamers.forEach(async (streamer, index) => {
+  Object.keys(streamers).forEach(async (streamer) => {
     try {
       let user = await client.getUser(streamer);
-      user.isLive().then(function (result) {
-        if (firstrun) {
-          statuses[streamer] = result;
-          userData[streamer] = user;
-          displayNames[streamer] = user.displayName
-        } else {
-          displayNames[streamer] = user.displayName
-          if (statuses[streamer] !== result) {
-            statuses[streamer] = result;
-            if(!paused) {   // only show notifications if not paused
-              if (result === true) {
-                createNotification({ streamer: streamer, title: userData[streamer].displayName + " is now online!", body: "Click to go to stream." })
-              } else {
-                createNotification({ title: "Twitchifier", body: userData[streamer].displayName + " is now offline..." })
+      if(user != null) {
+        
+        user.isLive().then(function (result) {
+
+          if (firstrun) {
+            streamers[streamer] = { name: streamer, isLive: result, displayName: user.displayName };
+          }
+
+          if(streamers[streamer].hasOwnProperty('isLive')) {
+            if(streamers[streamer].isLive != result) {
+              streamers[streamer].isLive = result;
+
+              if(!paused) {   // only show notifications if not paused
+                if (result === true) {
+                  createNotification({ streamer: streamer, title: streamers[streamer].displayName + " is now online!", body: "Click to go to stream." })
+                } else {
+                  createNotification({ title: "Twitchifier", body: streamers[streamer].displayName + " is now offline..." })
+                }
               }
             }
+          } else {
+            streamers[streamer] = { name: streamer, isLive: result, displayName: user.displayName };
           }
-        }
-      });
+
+        }).catch((err) => {
+          console.log('le error', err)
+        });
+      } else {
+        console.log('user seems to not exist')
+      }
     } catch (error) {
       //console.log("Error", error, error?.response?.body);
     }
@@ -246,7 +247,7 @@ const getAllStreamersStatuses = () => {
 
 
 let update = () => {
-  mainWindow.webContents.send('streamers',streamers, statuses, displayNames);
+  mainWindow.webContents.send('streamers',streamers);
   getAllStreamersStatuses();
 };
 
@@ -258,7 +259,7 @@ let initAutoUpdate = () => {
 }
 
 const init = async () => {
-  client = new Client({
+  client = await new Client({
     clientId: "w9iel69nch6roc7753qsld3ygmheor",
     clientSecret: "8akn7ofyez673ccn9llee1y09g3jer",
   });
@@ -302,7 +303,12 @@ app.whenReady().then(() => {
     }
   });
 
-  app.on("before-quit", function () {
+  app.on("before-quit", function (e) {
+    e.preventDefault()
+    for (const [streamer, obj] of Object.entries(streamers)) {
+      streamers[streamer] = {}
+    }
+    store.set("streamers", streamers); 
     isQuiting = true;
   });
 
