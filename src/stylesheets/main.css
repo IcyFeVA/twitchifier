@@ -84,7 +84,7 @@ a {
   padding: 8px 16px;
   margin-bottom: 4px;
   margin-top: 4px;
-  cursor: pointer;
+  /* cursor: pointer; */
   font-size: 12px;
   font-weight: bold;
 }
@@ -112,8 +112,9 @@ a {
 
 .name {
   width: 100%;
-  cursor: pointer;
+  /* cursor: pointer; */
   font-size: 15px;
+  user-select: none;
 }
 
 .faded {
@@ -150,7 +151,7 @@ a {
 }
 .fa-times:hover {
   color: red;
-  cursor: pointer;
+  /* cursor: pointer; */
 }
 
 /* width */

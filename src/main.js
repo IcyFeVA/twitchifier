@@ -172,9 +172,7 @@ const createTray = () => {
     {
       label: "Quit",
       click: () => {
-        for (const [key, val] of Object.entries(streamers)) {
-          streamers[key] = {}
-        }
+        resetStreamers()
         store.set("streamers", streamers); 
         app.exit(0);
       },
@@ -237,9 +235,10 @@ const getAllStreamersStatuses = () => {
         });
       } else {
         console.log('user seems to not exist')
+        delete streamers[streamer] 
       }
     } catch (error) {
-      //console.log("Error", error, error?.response?.body);
+      console.log("Error", error, error?.response?.body);
     }
   });
 };
@@ -275,6 +274,12 @@ const init = async () => {
 };
 
 
+const resetStreamers = () => {
+  for (const [streamer, val] of Object.entries(streamers)) {
+    streamers[streamer].isLive = 'check'
+  }
+}
+
 
 
 
@@ -305,9 +310,7 @@ app.whenReady().then(() => {
 
   app.on("before-quit", function (e) {
     e.preventDefault()
-    for (const [streamer, obj] of Object.entries(streamers)) {
-      streamers[streamer] = {}
-    }
+    resetStreamers()
     store.set("streamers", streamers); 
     isQuiting = true;
   });

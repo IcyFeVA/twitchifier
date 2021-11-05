@@ -54,8 +54,10 @@ class App extends React.Component {
   addStreamer() {
     let input = document.querySelector(".inputName")
 
-    if(input.value != "") {
-      ipcRenderer.send("add-streamer", input.value.toLowerCase());
+    let val = input.value
+    if(val != "") {
+      val = val.replace(/[^A-Z0-9]/ig, "");
+      ipcRenderer.send("add-streamer", val);
       input.value = ""
     }
   }
@@ -69,10 +71,29 @@ class App extends React.Component {
         ipcRenderer.send("delete-streamer", props.streamer);
       }
 
-      if(props.state.streamers[props.streamer].hasOwnProperty('displayName')) {
+      if(props.state.streamers[props.streamer].hasOwnProperty('isLive')) {
 
-        const isLive = props.state.streamers[props.streamer].isLive || false
-        const displayName = props.state.streamers[props.streamer].displayName || props.streamer
+        const isLive = props.state.streamers[props.streamer].isLive
+        const displayName = props.state.streamers[props.streamer].displayName
+
+        if(isLive == 'check') { // App was closed and isLive was set to check
+          return (
+            <li className="listItem">
+              <div className="loader"></div>
+              <div className="name" onClick={() => { ipcRenderer.send("goto-streamer", props.streamer) }}>{displayName}</div>
+              <div className="btnDelete fa fa-times" onClick={() => deleteStreamer()}></div>
+            </li>
+          );
+        } 
+        if(isLive == 'doesntexist') { // App was closed and isLive was set to check
+          return (
+            <li className="listItem">
+              <div className="loader"></div>
+              <div className="name">? {displayName}</div>
+              <div className="btnDelete fa fa-times" onClick={() => deleteStreamer()}></div>
+            </li>
+          );
+        } 
         if(isLive) {
           return (
             <li className="listItem">
@@ -92,6 +113,7 @@ class App extends React.Component {
         }
       }
 
+      // just added streamer
       return (
         <li className="listItem">
           <div className="loader"></div>
@@ -103,11 +125,17 @@ class App extends React.Component {
 
     const state = this.state;
 
+    const handleKeyDown = e => {
+      if (e.key === " ") {
+        e.preventDefault();
+      }
+    };
+
     if(Object.keys(state.streamers).length == 0) {
       return (
         <div className="UI">
           <div className="header">
-          <input type="text" placeholder="Streamer" className="inputName" />
+          <input type="text" placeholder="Streamer" className="inputName" onKeyDown={handleKeyDown} />
           <button className="addButton" onClick={() => this.addStreamer()}>ADD</button>
           </div>
           <div className="suggestion">
@@ -119,7 +147,7 @@ class App extends React.Component {
       return (
         <div className="UI">
           <div className="header">
-          <input type="text" placeholder="Streamer" className="inputName" />
+          <input type="text" placeholder="Streamer" className="inputName" onKeyDown={handleKeyDown} />
           <button className="addButton" onClick={() => this.addStreamer()}>ADD</button>
           </div>
           <ul>
