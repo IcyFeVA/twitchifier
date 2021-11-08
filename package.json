@@ -1,15 +1,14 @@
 {
-  "name": "ttv-notifier",
-  "productName": "TTV-Notifier",
+  "name": "twitchifier",
+  "productName": "Twitchifier",
   "description": "Notifies you when your favorite streamers go live",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
   "author": "IcyFeVA <hi@icyfeva.com>",
-  "copyright": "© 2017, Gumby inc.",
-  "homepage": "http://example.com",
+  "copyright": "© 2021, IcyFeVA",
+  "homepage": "https://twitchifier.com",
   "main": "app/main.js",
   "build": {
-    "appId": "com.icyfeva.ttvnotifier",
+    "appId": "com.icyfeva.twitchifier",
     "files": [
       "app/**/*",
       "node_modules/**/*",
@@ -28,11 +27,13 @@
     "e2e": "mocha temp/e2e.js --require source-map-support/register",
     "test": "npm run unit && npm run e2e",
     "start": "node build/start.js",
-    "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder"
+    "release": "webpack --config=build/webpack.app.config.js --env=production && electron-builder"
   },
   "dependencies": {
     "dank-twitch-api": "^0.0.1",
-    "fs-jetpack": "^4.1.0"
+    "fs-jetpack": "^4.1.0",
+    "open": "^8.4.0",
+    "electron-store": "^8.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",

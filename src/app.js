@@ -15,14 +15,14 @@ ipcRenderer.on("pause-status", (e, paused) => {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { streamers: {}, streamerNames: [] };
+    this.state = { streamers: {}, streamerNames: [], paused: false };
     
     // this.deleteStreamer = this.deleteStreamer.bind(this);
   }
 
   componentWillMount() {
-    ipcRenderer.on("pause-status", (e, paused) => {
-      console.log("---", paused);
+    ipcRenderer.on("paused", (e, paused) => {
+      this.setState({ paused: paused });
     });
 
     ipcRenderer.on("streamers", (e, streamers) => {
@@ -123,6 +123,14 @@ class App extends React.Component {
       );
     }
 
+    function Paused(props) {
+      if(props.paused === true) {
+        return <div className="paused">NOTIFICATIONS PAUSED</div>
+      } else {
+        return <div></div>
+      }
+    }
+
     const state = this.state;
 
     const handleKeyDown = e => {
@@ -134,6 +142,7 @@ class App extends React.Component {
     if(Object.keys(state.streamers).length == 0) {
       return (
         <div className="UI">
+          <Paused paused={state.paused} />
           <div className="header">
           <input type="text" placeholder="Streamer" className="inputName" onKeyDown={handleKeyDown} />
           <button className="addButton" onClick={() => this.addStreamer()}>ADD</button>
@@ -146,6 +155,7 @@ class App extends React.Component {
     } else {
       return (
         <div className="UI">
+          <Paused paused={state.paused} />
           <div className="header">
           <input type="text" placeholder="Streamer" className="inputName" onKeyDown={handleKeyDown} />
           <button className="addButton" onClick={() => this.addStreamer()}>ADD</button>

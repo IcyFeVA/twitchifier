@@ -1,5 +1,4 @@
 import path from "path";
-import url from "url";
 import { app, Menu, Tray, nativeImage, Notification, ipcMain } from "electron";
 import appMenuTemplate from "./menu/app_menu_template";
 import aboutMenuTemplate from "./menu/about_menu_template";
@@ -14,14 +13,13 @@ let tray;
 let paused = false;
 let isQuiting = false;
 let firstrun = true;
-let statuses = {};
 let client;
-
 let updateSpeed = 6000;
 let updateInterval;
+
 const store = new Store();
 let streamers = store.get("streamers") || {}; 
-console.log(streamers)
+
 // let streamers = {
 //   imakuni: {},
 //   towelliee: {},
@@ -65,17 +63,13 @@ const setApplicationMenu = () => {
 
 
 const initIpc = () => {
-  ipcMain.on("get-pause", (e, arg) => {
-    e.reply("pause-status", paused);
-  });
-
   ipcMain.on("get-streamers", (e, arg) => {
     e.reply("streamers", streamers);
   });
 
   ipcMain.on("add-streamer", (e, streamer) => {
     if(streamers.hasOwnProperty(streamer)) {
-      console.log('streamer already in list')
+      //console.log('streamer already in list')
       return;
     }
     streamers[streamer] = {}
@@ -128,7 +122,7 @@ const createMainWindow = () => {
   });
 
   if (env.name === "development") {
-    mainWindow.openDevTools();
+    //mainWindow.openDevTools();
   }
 };
 
@@ -166,6 +160,7 @@ const createTray = () => {
         paused = e.checked;
         store.set("paused", paused);
         setIcon()
+        mainWindow.webContents.send('paused',paused);
         //console.log("paused", store.get("paused"));
       },
     },
@@ -179,7 +174,7 @@ const createTray = () => {
     },
   ]);
 
-  tray.setToolTip("Twitch-Mate");
+  tray.setToolTip("Twitchifier");
   tray.setContextMenu(contextMenu);
 
   setIcon()
@@ -230,11 +225,13 @@ const getAllStreamersStatuses = () => {
             streamers[streamer] = { name: streamer, isLive: result, displayName: user.displayName };
           }
 
+          mainWindow.webContents.send('streamers',streamers);
+
         }).catch((err) => {
           console.log('le error', err)
         });
       } else {
-        console.log('user seems to not exist')
+        //console.log('user seems to not exist and will be deleted.')
         delete streamers[streamer] 
       }
     } catch (error) {
@@ -269,6 +266,7 @@ const init = async () => {
   if (firstrun) {
     setTimeout(() => {
       firstrun = false;
+      mainWindow.webContents.send('paused',paused);
     }, 3000);
   }
 };

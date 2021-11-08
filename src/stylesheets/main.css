@@ -203,3 +203,12 @@ a {
 .bold {
   font-weight: bold;
 }
+
+.paused {
+  background-color: #821c42;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.7em;
+  padding: 4px;
+}

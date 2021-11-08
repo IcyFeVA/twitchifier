@@ -3,9 +3,14 @@ import open from "open";
 export default {
   label: "About",
   submenu: [
-    { label: "Twitchifier by IcyFeVA",
-  click: () => {
-    open("https://www.twitchifier.com/")
-  }},
-  ]
+    {
+      label: "www.twitchifier.com",
+      click: () => {
+        open("https://www.twitchifier.com/");
+      },
+    },
+    {
+      label: "Version 1.0.0",
+    },
+  ],
 };
