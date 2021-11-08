@@ -56,7 +56,7 @@ class App extends React.Component {
 
     let val = input.value
     if(val != "") {
-      val = val.replace(/[^A-Z0-9]/ig, "");
+      val = val.replace(/[^A-Z0-9_]/ig, "");
       ipcRenderer.send("add-streamer", val);
       input.value = ""
     }

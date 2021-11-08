@@ -17,7 +17,10 @@
     "directories": {
       "buildResources": "resources"
     },
-    "publish": null
+    "publish": null,
+    "linux": {
+      "icon": "icon512.png"
+    }
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
