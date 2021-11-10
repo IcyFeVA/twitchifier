@@ -33,10 +33,11 @@
     "release": "webpack --config=build/webpack.app.config.js --env=production && electron-builder"
   },
   "dependencies": {
+    "howler": "^2.2.3",
     "dank-twitch-api": "^0.0.1",
+    "electron-store": "^8.0.1",
     "fs-jetpack": "^4.1.0",
-    "open": "^8.4.0",
-    "electron-store": "^8.0.1"
+    "open": "^8.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
@@ -50,6 +51,7 @@
     "electron-builder": "^22.5.1",
     "electron-mocha": "^10.0.0",
     "electron-store": "^8.0.1",
+    "howler": "^2.2.3",
     "mocha": "^8.3.2",
     "open": "^8.4.0",
     "source-map-support": "^0.5.6",

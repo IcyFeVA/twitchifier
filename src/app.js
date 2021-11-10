@@ -2,13 +2,28 @@
 
 import "./stylesheets/main.css";
 import { ipcRenderer } from "electron";
+import {Howl, Howler} from 'howler';
 
 ipcRenderer.on("pause-status", (e, paused) => {
   //console.log("---", paused);
 });
+ipcRenderer.on("play-sound-on", (e, paused) => {
+  soundOn.play()
+});
+ipcRenderer.on("play-sound-off", (e, paused) => {
+  soundOff.play()
+});
 
 
-
+// Sounds
+var soundOn = new Howl({ src: ['on.wav'], onend: function() {
+  console.log('Finished!');
+},onloaderror: function(e) {
+  console.log(e);
+},onplayerror: function(e) {
+  console.log(e);
+} });
+var soundOff = new Howl({ src: ['off.wav'] });
 
 
 

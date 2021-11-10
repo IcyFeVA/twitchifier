@@ -122,7 +122,7 @@ const createMainWindow = () => {
   });
 
   if (env.name === "development") {
-    //mainWindow.openDevTools();
+    mainWindow.openDevTools();
   }
 };
 
@@ -216,16 +216,16 @@ const getAllStreamersStatuses = () => {
               if(!paused) {   // only show notifications if not paused
                 if (result === true) {
                   createNotification({ streamer: streamer, title: streamers[streamer].displayName + " is now online!", body: "Click to go to stream." })
+                  mainWindow.webContents.send('play-sound-on',streamers);
                 } else {
                   createNotification({ title: "Twitchifier", body: streamers[streamer].displayName + " is now offline..." })
+                  mainWindow.webContents.send('play-sound-off',streamers);
                 }
               }
             }
           } else {
             streamers[streamer] = { name: streamer, isLive: result, displayName: user.displayName };
           }
-
-          mainWindow.webContents.send('streamers',streamers);
 
         }).catch((err) => {
           console.log('le error', err)
@@ -238,12 +238,13 @@ const getAllStreamersStatuses = () => {
       console.log("Error", error, error?.response?.body);
     }
   });
+  mainWindow.webContents.send('streamers',streamers);
 };
 
 
 
 let update = () => {
-  mainWindow.webContents.send('streamers',streamers);
+  //mainWindow.webContents.send('streamers',streamers);
   getAllStreamersStatuses();
 };
 
