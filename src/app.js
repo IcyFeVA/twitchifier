@@ -5,18 +5,16 @@ import { ipcRenderer } from "electron";
 import {Howl, Howler} from 'howler';
 
 // Sounds
-var soundOn = new Howl({ src: ['on.wav'] });
-var soundOff = new Howl({ src: ['off.wav'] });
+var soundOn = new Howl({ src: ['on.wav'], volume: 0.5 });
+var soundOff = new Howl({ src: ['off.wav'], volume: 0.5 });
 
 ipcRenderer.on("pause-status", (e, paused) => {
   //console.log("---", paused);
 });
 ipcRenderer.on("play-sound-on", (e, paused) => {
-  soundOn.volume = 0.5
   soundOn.play()
 });
 ipcRenderer.on("play-sound-off", (e, paused) => {
-  soundOff.volume = 0.5
   soundOff.play()
 });
 
